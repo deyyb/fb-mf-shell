@@ -10,6 +10,8 @@
 
 
 const { configure } = require('quasar/wrappers');
+const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin');
+
 
 
 module.exports = configure(function (/* ctx */) {
@@ -76,7 +78,23 @@ module.exports = configure(function (/* ctx */) {
             lintCommand: 'eslint "./**/*.{js,mjs,cjs,vue}"'
           }
         }, { server: false }]
-      ]
+      ],
+
+      extendWebpack(cfg) {
+        // Inject the Module Federation plugin configuration
+        cfg.plugins.push(
+          new ModuleFederationPlugin({
+            name: 'fessbook_shell', // Unique name for the micro frontend
+            remotes: {
+              // insert
+            },
+            shared: {
+              vue: { singleton: true, eager: true, requiredVersion: '^3.0.0' },
+              quasar: { singleton: true, eager: true, requiredVersion: '^2.0.0' },
+            },
+          })
+        );
+      },
     },
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#devServer
